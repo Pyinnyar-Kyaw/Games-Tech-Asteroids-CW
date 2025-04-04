@@ -1,1 +1,3 @@
-﻿
+﻿cl : command line  warning D9035: option 'Gm' has been deprecated and will be removed in a future release
+  GlutWindow.cpp
+  Engine.vcxproj -> C:\Mike\School\Games Tech\IN2026 Coursework Code\lib\Engine.lib

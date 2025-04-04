@@ -222,6 +222,14 @@ void Asteroids::CreateGUI()
 	shared_ptr<GUIComponent> score_component
 		= static_pointer_cast<GUIComponent>(mScoreLabel);
 	mGameDisplay->GetContainer()->AddComponent(score_component, GLVector2f(0.0f, 1.0f));
+	
+	// Game Start Menu GUI Label
+	mStartMenuLabel = make_shared<GUILabel>("Press S to start");
+	mStartMenuLabel->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
+	mStartMenuLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_BOTTOM);
+	shared_ptr<GUIComponent> startMenu_component = static_pointer_cast<GUIComponent>(mStartMenuLabel);
+	mGameDisplay->GetContainer()->AddComponent(startMenu_component, GLVector2f(0.5f, 0.5f));
+	
 
 	// Create a new GUILabel and wrap it up in a shared_ptr
 	mLivesLabel = make_shared<GUILabel>("Lives: 3");
@@ -291,7 +299,3 @@ shared_ptr<GameObject> Asteroids::CreateExplosion()
 	explosion->Reset();
 	return explosion;
 }
-
-
-
-

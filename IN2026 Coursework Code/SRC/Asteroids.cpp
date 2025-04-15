@@ -59,7 +59,7 @@ void Asteroids::Start()
 	Animation *spaceship_anim = AnimationManager::GetInstance().CreateAnimationFromFile("spaceship", 128, 128, 128, 128, "spaceship_fs.png");
 
 	// Create a spaceship and add it to the world
-	mGameWorld->AddObject(CreateSpaceship());
+	//mGameWorld->AddObject(CreateSpaceship());
 	// Create some asteroids and add them to the world
 	CreateAsteroids(10);
 
@@ -71,6 +71,10 @@ void Asteroids::Start()
 
 	// Add this class as a listener of the player
 	mPlayer.AddListener(thisPtr);
+
+	// TEMPORARY SOLUTION: MAKE LIVES AND SCORE LABEL INVISIBLE ON GAME START
+	mLivesLabel->SetVisible(false);
+	mScoreLabel->SetVisible(false);
 
 	// Start the game
 	GameSession::Start();
@@ -92,6 +96,11 @@ void Asteroids::OnKeyPressed(uchar key, int x, int y)
 	case ' ':
 		mSpaceship->Shoot();
 		break;
+	case 's':
+		mGameWorld->AddObject(CreateSpaceship());
+		mStartMenuLabel->SetVisible(false);
+		mLivesLabel->SetVisible(true);
+		mScoreLabel->SetVisible(true);
 	default:
 		break;
 	}

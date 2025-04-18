@@ -40,6 +40,10 @@ public:
 		}
 	}
 
+	int GetLives() const {
+		return mLives;
+	}
+
 private:
 	int mLives;
 

@@ -94,13 +94,20 @@ void Asteroids::OnKeyPressed(uchar key, int x, int y)
 	switch (key)
 	{
 	case ' ':
-		mSpaceship->Shoot();
+		if (mSpaceship && mSpaceship->GetWorld() != nullptr) {
+			mSpaceship->Shoot();
+		}
 		break;
 	case 's':
-		mGameWorld->AddObject(CreateSpaceship());
-		mStartMenuLabel->SetVisible(false);
-		mLivesLabel->SetVisible(true);
-		mScoreLabel->SetVisible(true);
+		if (!mSpaceship || mSpaceship->GetWorld() == nullptr) {
+			if (mPlayer.GetLives() > 0) {
+				mGameWorld->AddObject(CreateSpaceship());
+				mStartMenuLabel->SetVisible(false);
+				mLivesLabel->SetVisible(true);
+				mScoreLabel->SetVisible(true);
+			}
+		}
+		
 	default:
 		break;
 	}
@@ -113,11 +120,26 @@ void Asteroids::OnSpecialKeyPressed(int key, int x, int y)
 	switch (key)
 	{
 	// If up arrow key is pressed start applying forward thrust
-	case GLUT_KEY_UP: mSpaceship->Thrust(10); break;
+	case GLUT_KEY_UP: 
+		if (mSpaceship && mSpaceship->GetWorld() != nullptr) 
+		{
+			mSpaceship->Thrust(10);
+		} 
+		break;
 	// If left arrow key is pressed start rotating anti-clockwise
-	case GLUT_KEY_LEFT: mSpaceship->Rotate(90); break;
+	case GLUT_KEY_LEFT: 
+		if (mSpaceship && mSpaceship->GetWorld() != nullptr)
+		{
+			mSpaceship->Rotate(90);
+		} 
+		break;
 	// If right arrow key is pressed start rotating clockwise
-	case GLUT_KEY_RIGHT: mSpaceship->Rotate(-90); break;
+	case GLUT_KEY_RIGHT: 
+		if (mSpaceship && mSpaceship->GetWorld() != nullptr)
+		{
+			mSpaceship->Rotate(-90);
+		}
+		 break;
 	// Default case - do nothing
 	default: break;
 	}
@@ -128,11 +150,26 @@ void Asteroids::OnSpecialKeyReleased(int key, int x, int y)
 	switch (key)
 	{
 	// If up arrow key is released stop applying forward thrust
-	case GLUT_KEY_UP: mSpaceship->Thrust(0); break;
+	case GLUT_KEY_UP: 
+		if (mSpaceship && mSpaceship->GetWorld() != nullptr)
+		{
+			mSpaceship->Thrust(0);
+		}
+		break;
 	// If left arrow key is released stop rotating
-	case GLUT_KEY_LEFT: mSpaceship->Rotate(0); break;
+	case GLUT_KEY_LEFT:
+		if (mSpaceship && mSpaceship->GetWorld() != nullptr)
+		{
+			mSpaceship->Rotate(0);
+		}
+		break;
 	// If right arrow key is released stop rotating
-	case GLUT_KEY_RIGHT: mSpaceship->Rotate(0); break;
+	case GLUT_KEY_RIGHT: 
+		if (mSpaceship && mSpaceship->GetWorld() != nullptr)
+		{
+			mSpaceship->Rotate(0);
+		}
+		break;
 	// Default case - do nothing
 	default: break;
 	} 
@@ -236,9 +273,38 @@ void Asteroids::CreateGUI()
 	mStartMenuLabel = make_shared<GUILabel>("Press S to start");
 	mStartMenuLabel->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
 	mStartMenuLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_BOTTOM);
-	shared_ptr<GUIComponent> startMenu_component = static_pointer_cast<GUIComponent>(mStartMenuLabel);
-	mGameDisplay->GetContainer()->AddComponent(startMenu_component, GLVector2f(0.5f, 0.5f));
+	shared_ptr<GUIComponent> start_menu_component = static_pointer_cast<GUIComponent>(mStartMenuLabel);
+	mGameDisplay->GetContainer()->AddComponent(start_menu_component, GLVector2f(0.5f, 0.5f));
 	
+	// Gameplay Instructions Title label
+	mInstructionsTitleLabel = make_shared<GUILabel>("Instructions:");
+	mInstructionsTitleLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_BOTTOM);
+	shared_ptr<GUIComponent> instructions_title_component = static_pointer_cast<GUIComponent>(mInstructionsTitleLabel);
+	mGameDisplay->GetContainer()->AddComponent(instructions_title_component, GLVector2f(0.0f, 0.37f));
+
+	// Gameplay Instructions Space label
+	mInstructionsSpaceLabel = make_shared<GUILabel>("SPACE to shoot");
+	mInstructionsSpaceLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_BOTTOM);
+	shared_ptr<GUIComponent> instructions_space_component = static_pointer_cast<GUIComponent>(mInstructionsSpaceLabel);
+	mGameDisplay->GetContainer()->AddComponent(instructions_space_component, GLVector2f(0.0f, 0.27f));
+
+	// Gameplay Instructions Up label
+	mInstructionsUpLabel = make_shared<GUILabel>("Up to accelerate");
+	mInstructionsUpLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_BOTTOM);
+	shared_ptr<GUIComponent> instructions_up_component = static_pointer_cast<GUIComponent>(mInstructionsUpLabel);
+	mGameDisplay->GetContainer()->AddComponent(instructions_up_component, GLVector2f(0.0f, 0.23f));
+
+	// Gameplay Instructions Left label
+	/*mInstructionsLeftLabel = make_shared<GUILabel>("Left to turn left");
+	mInstructionsLeftLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_BOTTOM);
+	shared_ptr<GUIComponent> instructions_left_component = static_pointer_cast<GUIComponent>(mInstructionsLeftLabel);
+	mGameDisplay->GetContainer()->AddComponent(instructions_left_component, GLVector2f(0.0f, 0.19f));*/
+
+	// Gameplay Instructions Right label
+	/*mInstructionsRightLabel = make_shared<GUILabel>("Right to turn right");
+	mInstructionsRightLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_BOTTOM);
+	shared_ptr<GUIComponent> instructions_right_component = static_pointer_cast<GUIComponent>(mInstructionsRightLabel);
+	mGameDisplay->GetContainer()->AddComponent(instructions_right_component, GLVector2f(0.0f, 0.15f));*/
 
 	// Create a new GUILabel and wrap it up in a shared_ptr
 	mLivesLabel = make_shared<GUILabel>("Lives: 3");

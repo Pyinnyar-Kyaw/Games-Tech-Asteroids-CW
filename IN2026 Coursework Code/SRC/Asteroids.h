@@ -53,6 +53,11 @@ private:
 	shared_ptr<GUILabel> mLivesLabel;
 	shared_ptr<GUILabel> mGameOverLabel;
 	shared_ptr<GUILabel> mStartMenuLabel;
+	shared_ptr<GUILabel> mInstructionsTitleLabel;
+	shared_ptr<GUILabel> mInstructionsSpaceLabel;
+	shared_ptr<GUILabel> mInstructionsUpLabel;
+	//shared_ptr<GUILabel> mInstructionsLeftLabel;
+	//shared_ptr<GUILabel> mInstructionsRightLabel;
 
 	uint mLevel;
 	uint mAsteroidCount;

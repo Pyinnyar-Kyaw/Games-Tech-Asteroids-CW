@@ -11,6 +11,7 @@
 #include "BoundingSphere.h"
 #include "GUILabel.h"
 #include "Explosion.h"
+#include "ExtraLifePowerup.h"
 
 // PUBLIC INSTANCE CONSTRUCTORS ///////////////////////////////////////////////
 
@@ -63,6 +64,8 @@ void Asteroids::Start()
 	// Create some asteroids and add them to the world
 	CreateAsteroids(10);
 
+	CreateExtraLifePowerup(1);
+
 	//Create the GUI
 	CreateGUI();
 
@@ -105,6 +108,8 @@ void Asteroids::OnKeyPressed(uchar key, int x, int y)
 				mStartMenuLabel->SetVisible(false);
 				mLivesLabel->SetVisible(true);
 				mScoreLabel->SetVisible(true);
+				mInstructionsShootLabel->SetVisible(false);
+				mInstructionsMovementLabel->SetVisible(false);
 			}
 		}
 		
@@ -140,6 +145,12 @@ void Asteroids::OnSpecialKeyPressed(int key, int x, int y)
 			mSpaceship->Rotate(-90);
 		}
 		 break;
+	case GLUT_KEY_DOWN:
+		if (mSpaceship && mSpaceship->GetWorld() != nullptr) 
+		{
+			mSpaceship->Brake();
+		}
+		break;
 	// Default case - do nothing
 	default: break;
 	}
@@ -170,6 +181,12 @@ void Asteroids::OnSpecialKeyReleased(int key, int x, int y)
 			mSpaceship->Rotate(0);
 		}
 		break;
+	case GLUT_KEY_DOWN:
+		if (mSpaceship && mSpaceship->GetWorld() != nullptr)
+		{
+			//mSpaceship->Thrust(0);
+		}
+		break;
 	// Default case - do nothing
 	default: break;
 	} 
@@ -187,12 +204,26 @@ void Asteroids::OnObjectRemoved(GameWorld* world, shared_ptr<GameObject> object)
 		explosion->SetRotation(object->GetRotation());
 		mGameWorld->AddObject(explosion);
 		mAsteroidCount--;
-		if (mAsteroidCount <= 0) 
-		{ 
-			SetTimer(500, START_NEXT_LEVEL); 
+		if (mAsteroidCount <= 0)
+		{
+			SetTimer(500, START_NEXT_LEVEL);
 		}
 	}
+	else if (object->GetType() == GameObjectType("ExtraLifePowerUp"))
+	{
+		int lives = mPlayer.GetLives();
+		mPlayer.SetLives(lives + 1);
+		if (mLivesLabel)
+		{
+			std::ostringstream msg;
+			msg << "Lives: " << (lives + 1);
+			mLivesLabel->SetText(msg.str());
+		}
+
+		return;
+	}
 }
+
 
 // PUBLIC INSTANCE METHODS IMPLEMENTING ITimerListener ////////////////////////
 
@@ -234,6 +265,7 @@ shared_ptr<GameObject> Asteroids::CreateSpaceship()
 	mSpaceship->SetScale(0.1f);
 	// Reset spaceship back to centre of the world
 	mSpaceship->Reset();
+
 	// Return the spaceship so it can be added to the world
 	return mSpaceship;
 
@@ -253,6 +285,24 @@ void Asteroids::CreateAsteroids(const uint num_asteroids)
 		asteroid->SetSprite(asteroid_sprite);
 		asteroid->SetScale(0.2f);
 		mGameWorld->AddObject(asteroid);
+	}
+}
+
+void Asteroids::CreateExtraLifePowerup(const uint num_extraLifePowerups)
+{
+	for (uint i = 0; i < num_extraLifePowerups; i++)
+	{
+		// Create animation for powerup
+		Animation* anim_ptr = AnimationManager::GetInstance().GetAnimationByName("spaceship");  // Use existing animation or create a new one
+		shared_ptr<Sprite> powerup_sprite
+			= make_shared<Sprite>(anim_ptr->GetWidth(), anim_ptr->GetHeight(), anim_ptr);
+		powerup_sprite->SetLoopAnimation(true);
+
+		shared_ptr<GameObject> powerup = make_shared<ExtraLifePowerup>();
+		powerup->SetBoundingShape(make_shared<BoundingSphere>(powerup->GetThisPtr(), 5.0f));
+		powerup->SetSprite(powerup_sprite);
+		powerup->SetScale(0.1f);
+		mGameWorld->AddObject(powerup);
 	}
 }
 
@@ -276,23 +326,23 @@ void Asteroids::CreateGUI()
 	shared_ptr<GUIComponent> start_menu_component = static_pointer_cast<GUIComponent>(mStartMenuLabel);
 	mGameDisplay->GetContainer()->AddComponent(start_menu_component, GLVector2f(0.5f, 0.5f));
 	
-	// Gameplay Instructions Title label
-	mInstructionsTitleLabel = make_shared<GUILabel>("Instructions:");
-	mInstructionsTitleLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_BOTTOM);
-	shared_ptr<GUIComponent> instructions_title_component = static_pointer_cast<GUIComponent>(mInstructionsTitleLabel);
-	mGameDisplay->GetContainer()->AddComponent(instructions_title_component, GLVector2f(0.0f, 0.37f));
+	// Gameplay Instructions Shoot label
+	mInstructionsShootLabel = make_shared<GUILabel>("SPACE to shoot");
+	mInstructionsShootLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_BOTTOM);
+	shared_ptr<GUIComponent> instructions_shoot_component = static_pointer_cast<GUIComponent>(mInstructionsShootLabel);
+	mGameDisplay->GetContainer()->AddComponent(instructions_shoot_component, GLVector2f(0.0f, 0.37f));
 
-	// Gameplay Instructions Space label
-	mInstructionsSpaceLabel = make_shared<GUILabel>("SPACE to shoot");
-	mInstructionsSpaceLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_BOTTOM);
-	shared_ptr<GUIComponent> instructions_space_component = static_pointer_cast<GUIComponent>(mInstructionsSpaceLabel);
-	mGameDisplay->GetContainer()->AddComponent(instructions_space_component, GLVector2f(0.0f, 0.27f));
+	// Gameplay Instructions Movement label
+	mInstructionsMovementLabel = make_shared<GUILabel>("ARROW KEYS to move");
+	mInstructionsMovementLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_BOTTOM);
+	shared_ptr<GUIComponent> instructions_movement_component = static_pointer_cast<GUIComponent>(mInstructionsMovementLabel);
+	mGameDisplay->GetContainer()->AddComponent(instructions_movement_component, GLVector2f(0.0f, 0.27f));
 
-	// Gameplay Instructions Up label
-	mInstructionsUpLabel = make_shared<GUILabel>("Up to accelerate");
-	mInstructionsUpLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_BOTTOM);
-	shared_ptr<GUIComponent> instructions_up_component = static_pointer_cast<GUIComponent>(mInstructionsUpLabel);
-	mGameDisplay->GetContainer()->AddComponent(instructions_up_component, GLVector2f(0.0f, 0.23f));
+	//// Gameplay Instructions Up label
+	//mInstructionsUpLabel = make_shared<GUILabel>("Up to accelerate");
+	//mInstructionsUpLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_BOTTOM);
+	//shared_ptr<GUIComponent> instructions_up_component = static_pointer_cast<GUIComponent>(mInstructionsUpLabel);
+	//mGameDisplay->GetContainer()->AddComponent(instructions_up_component, GLVector2f(0.0f, 0.23f));
 
 	// Gameplay Instructions Left label
 	/*mInstructionsLeftLabel = make_shared<GUILabel>("Left to turn left");
@@ -361,6 +411,16 @@ void Asteroids::OnPlayerKilled(int lives_left)
 	{
 		SetTimer(500, SHOW_GAME_OVER);
 	}
+}
+
+void Asteroids::OnLivesChanged(int lives)
+{
+	// Format the lives message using a string-based stream
+	std::ostringstream msg_stream;
+	msg_stream << "Lives: " << lives;
+	// Get the lives message as a string
+	std::string lives_msg = msg_stream.str();
+	mLivesLabel->SetText(lives_msg);
 }
 
 shared_ptr<GameObject> Asteroids::CreateExplosion()

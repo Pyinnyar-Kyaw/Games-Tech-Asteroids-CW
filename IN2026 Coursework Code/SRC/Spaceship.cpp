@@ -68,6 +68,16 @@ void Spaceship::Rotate(float r)
 	mRotation = r;
 }
 
+void Spaceship::Brake()
+{
+	GLVector3f velocity = GetVelocity();
+
+	// Reduce velocity by a factor (e.g., 10%)
+	velocity *= 0.9f;
+
+	SetVelocity(velocity);
+}
+
 /** Shoot a bullet. */
 void Spaceship::Shoot(void)
 {
@@ -94,6 +104,7 @@ void Spaceship::Shoot(void)
 
 bool Spaceship::CollisionTest(shared_ptr<GameObject> o)
 {
+	if (o->GetType() == GameObjectType("ExtraLifePowerUp")) return false;
 	if (o->GetType() != GameObjectType("Asteroid")) return false;
 	if (mBoundingShape.get() == NULL) return false;
 	if (o->GetBoundingShape().get() == NULL) return false;

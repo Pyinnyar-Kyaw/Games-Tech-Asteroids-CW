@@ -40,6 +40,8 @@ public:
 		}
 	}
 
+	void SetLives(int lives) { mLives = lives; }
+
 	int GetLives() const {
 		return mLives;
 	}

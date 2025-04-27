@@ -3,6 +3,7 @@
 #include "Bullet.h"
 #include "Spaceship.h"
 #include "BoundingSphere.h"
+#include "SpiralBullet.h"
 
 using namespace std;
 
@@ -101,6 +102,26 @@ void Spaceship::Shoot(void)
 	mWorld->AddObject(bullet);
 
 }
+
+//shoot spiral bullet
+void Spaceship::ShootSpiral()
+{
+	if (!mWorld) return;
+
+	GLVector3f heading(cos(DEG2RAD * mAngle), sin(DEG2RAD * mAngle), 0);
+	heading.normalize();
+
+	GLVector3f pos = mPosition + (heading * 4);
+	float speed = 20.0f;
+	GLVector3f vel = mVelocity + heading * speed;
+
+	shared_ptr<GameObject> bullet = make_shared<SpiralBullet>(pos, vel, mAcceleration, mAngle, 0, 3000);
+	bullet->SetBoundingShape(make_shared<BoundingSphere>(bullet->GetThisPtr(), 2.0f));
+	bullet->SetShape(mBulletShape);
+
+	mWorld->AddObject(bullet);
+}
+
 
 bool Spaceship::CollisionTest(shared_ptr<GameObject> o)
 {

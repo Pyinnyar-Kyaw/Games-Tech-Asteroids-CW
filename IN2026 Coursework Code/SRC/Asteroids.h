@@ -9,6 +9,9 @@
 #include "ScoreKeeper.h"
 #include "Player.h"
 #include "IPlayerListener.h"
+#include <vector>
+#include <string>
+#include <utility>
 
 class GameObject;
 class Spaceship;
@@ -22,8 +25,6 @@ public:
 
 	virtual void Start(void);
 	virtual void Stop(void);
-
-	//virtual void Update();
 
 	// Declaration of IKeyboardListener interface ////////////////////////////////
 
@@ -39,8 +40,6 @@ public:
 	// Declaration of the IPlayerLister interface //////////////////////////////
 
 	void OnPlayerKilled(int lives_left);
-
-	virtual void OnLivesChanged(int lives);
 
 	// Declaration of IGameWorldListener interface //////////////////////////////
 
@@ -59,9 +58,13 @@ private:
 	shared_ptr<GUILabel> mStartMenuLabel;
 	shared_ptr<GUILabel> mInstructionsShootLabel;
 	shared_ptr<GUILabel> mInstructionsMovementLabel;
-	//shared_ptr<GUILabel> mInstructionsUpLabel;
-	//shared_ptr<GUILabel> mInstructionsLeftLabel;
-	//shared_ptr<GUILabel> mInstructionsRightLabel;
+	std::vector<shared_ptr<GUILabel>> mHighScoreLabels;
+	shared_ptr<GUILabel> mInstructionsTitleLabel;
+	shared_ptr<GUILabel>mSpiralLabel;
+	shared_ptr<GUILabel>mBrakeLabel;
+	shared_ptr<GUILabel>mExtraLifeLabel;
+
+
 
 	uint mLevel;
 	uint mAsteroidCount;
@@ -71,7 +74,23 @@ private:
 	shared_ptr<GameObject> CreateSpaceship();
 	void CreateGUI();
 	void CreateAsteroids(const uint num_asteroids);
-	void CreateExtraLifePowerup(const uint num_extraLifePowerups);
+	void CreateExtraLifePowerup();
+
+	void SaveHighScore(const std::string& tag, int score);
+	void LoadHighScores();
+	std::vector<std::pair<std::string, int>> mHighScores;
+
+	void UpdateToggleLabels();
+
+	bool mAwaitingGamerTag = false;
+	std::string mGamerTagBuffer;
+	shared_ptr<GUILabel> mGamerTagInputLabel;
+
+	bool mEnableSpiralBullet;
+	bool mEnableBrake;
+	bool mEnableExtraLife;
+
+	bool mInStartMenu;
 
 	shared_ptr<GameObject> CreateExplosion();
 	
